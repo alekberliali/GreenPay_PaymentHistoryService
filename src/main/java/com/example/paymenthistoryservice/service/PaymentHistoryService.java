@@ -3,7 +3,9 @@ package com.example.paymenthistoryservice.service;
 import com.example.paymenthistoryservice.dto.PageRequestDto;
 import com.example.paymenthistoryservice.dto.PageResponse;
 import com.example.paymenthistoryservice.dto.PaymentHistoryDto;
+import com.example.paymenthistoryservice.dto.ResponseReceiptDto;
 import com.example.paymenthistoryservice.entity.PaymentHistory;
+import com.example.paymenthistoryservice.exception.ReceiptNotFoundException;
 import com.example.paymenthistoryservice.mapper.PaymentHistoryMapper;
 import com.example.paymenthistoryservice.repository.PaymentHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,5 +41,10 @@ public class PaymentHistoryService {
                 .totalPages(result.getTotalPages())
                 .content(sortedMap)
                 .build();
+    }
+
+    public ResponseReceiptDto getById(String id) {
+        paymentHistoryRepository.findById(id).orElseThrow(() -> new ReceiptNotFoundException("receipt could not found by id: " + id));
+        return null;
     }
 }

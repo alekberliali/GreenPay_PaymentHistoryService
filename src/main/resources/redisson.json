@@ -1,0 +1,8 @@
+{
+  "singleServerConfig": {
+    "password": "Password12*",
+    "username": "default",
+    "address": "redis://164.90.228.210:6379",
+    "database": 1
+  }
+}
