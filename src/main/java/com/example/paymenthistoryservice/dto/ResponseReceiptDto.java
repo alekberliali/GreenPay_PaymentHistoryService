@@ -1,22 +1,24 @@
 package com.example.paymenthistoryservice.dto;
 
 
+import com.example.paymenthistoryservice.entity.Status;
+import com.example.paymenthistoryservice.entity.TransferType;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class ResponseReceiptDto {
     private BigDecimal amount;
-    private Timestamp paymentDate;
+    private LocalDateTime paymentDate;
     private String senderRequestId;
     private String name;
     private String from;
     private String to;
     private String currency;
-    private String type;
-    private Boolean status;
+    private TransferType type;
+    private Status status;
 }

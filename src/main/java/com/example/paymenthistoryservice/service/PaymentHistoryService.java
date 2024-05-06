@@ -21,9 +21,9 @@ public class PaymentHistoryService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentHistoryMapper paymentHistoryMapper;
 
-    public PageResponse<Date, List<PaymentHistoryDto>> getAllByUserId(String userId, PageRequestDto pageRequestDto) {
+    public PageResponse<Date, List<PaymentHistoryDto>> getAllByUserId(String userNumber, PageRequestDto pageRequestDto) {
         var pageRequest = PageRequest.of(pageRequestDto.page(), pageRequestDto.size());
-        var result = paymentHistoryRepository.findAllByUserId(userId, pageRequest);
+        var result = paymentHistoryRepository.findAllByUserNumber(userNumber, pageRequest);
 
         Map<Date, List<PaymentHistoryDto>> resultMap = new HashMap<>();
         for (PaymentHistory paymentHistory : result.getContent()) {
@@ -43,8 +43,11 @@ public class PaymentHistoryService {
                 .build();
     }
 
-    public ResponseReceiptDto getById(String id) {
-        paymentHistoryRepository.findById(id).orElseThrow(() -> new ReceiptNotFoundException("receipt could not found by id: " + id));
-        return null;
+    public ResponseReceiptDto getById(String senderRequestId) {
+        try {
+            return paymentHistoryMapper.HistoryToReceiptDto(paymentHistoryRepository.findSenderRequestId(senderRequestId));
+        } catch (ReceiptNotFoundException e) {
+            throw new ReceiptNotFoundException("receipt could not found by id: " + senderRequestId);
+        }
     }
 }
