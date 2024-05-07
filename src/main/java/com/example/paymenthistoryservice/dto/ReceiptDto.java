@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class ResponseReceiptDto {
+public class ReceiptDto {
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String senderRequestId;

@@ -41,14 +41,16 @@ public class PaymentHistory {
     private String currencyOut;
     @Column(name = "amount_out")
     private String amountOut;
-    @Column(name = "user_number")
-    private String userNumber;
+    @Column(name = "user_id")
+    private String userId;
     @Column(name = "to_user")
     private String toUser;
     @Enumerated(EnumType.STRING)
     @Column(name = "transfer_type")
     private TransferType transferType;
-    @Column(name = "service_name")
+    @Column(name = "service_id")
     private String serviceName;
+    @Column(name = "category_id")
+    private Integer categoryId;
     private Date date;
 }

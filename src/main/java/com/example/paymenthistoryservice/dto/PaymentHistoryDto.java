@@ -9,10 +9,13 @@ import java.time.LocalDateTime;
 
 @Data
 public class PaymentHistoryDto {
+    private Long id;
     private BigDecimal amount;
     private String toUser;
     private String serviceName;
+    private String senderRequestId;
     private TransferType transferType;
     private LocalDateTime paymentDate;
+    private String transactionId;
     private Status status;
 }

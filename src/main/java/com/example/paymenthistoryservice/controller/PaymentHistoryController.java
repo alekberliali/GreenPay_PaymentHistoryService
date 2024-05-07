@@ -3,7 +3,7 @@ package com.example.paymenthistoryservice.controller;
 import com.example.paymenthistoryservice.dto.PageRequestDto;
 import com.example.paymenthistoryservice.dto.PageResponse;
 import com.example.paymenthistoryservice.dto.PaymentHistoryDto;
-import com.example.paymenthistoryservice.dto.ResponseReceiptDto;
+import com.example.paymenthistoryservice.dto.ReceiptDto;
 import com.example.paymenthistoryservice.service.PaymentHistoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +25,13 @@ public class PaymentHistoryController {
         return ResponseEntity.ok(paymentHistoryService.getAllByUserId(id, pageRequestDto));
     }
 
-    @GetMapping("/{senderRequestId}")
-    public ResponseEntity<ResponseReceiptDto> getById(@PathVariable String senderRequestId) {
-        return ResponseEntity.ok(paymentHistoryService.getById(senderRequestId));
+    @GetMapping("/sender-request-id/{senderRequestId}")
+    public ResponseEntity<ReceiptDto> getBySenderRequestId(@PathVariable String senderRequestId) {
+        return ResponseEntity.ok(paymentHistoryService.getBySenderRequestId(senderRequestId));
+    }
+
+    @GetMapping("/receipt-id/{id}")
+    public ResponseEntity<ReceiptDto> getById(@PathVariable Long id){
+        return ResponseEntity.ok(paymentHistoryService.getById(id));
     }
 }

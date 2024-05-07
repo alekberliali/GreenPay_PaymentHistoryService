@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Long> {
 
-    Page<PaymentHistory> findAllByUserNumber(String userNumber, PageRequest pageRequest);
+    Page<PaymentHistory> findAllByUserId(String userId, PageRequest pageRequest);
 
     @Query("select receipt from PaymentHistory receipt where receipt.senderRequestId=:senderRequestId")
     PaymentHistory findSenderRequestId(String senderRequestId);
