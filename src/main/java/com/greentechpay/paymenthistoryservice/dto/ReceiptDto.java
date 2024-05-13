@@ -1,8 +1,6 @@
-package com.example.paymenthistoryservice.dto;
+package com.greentechpay.paymenthistoryservice.dto;
 
 
-import com.example.paymenthistoryservice.entity.Status;
-import com.example.paymenthistoryservice.entity.TransferType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,7 +16,7 @@ public class ReceiptDto {
     private String name;
     private String from;
     private String to;
-    private String currency;
+    private Currency currency;
     private TransferType type;
     private Status status;
 }

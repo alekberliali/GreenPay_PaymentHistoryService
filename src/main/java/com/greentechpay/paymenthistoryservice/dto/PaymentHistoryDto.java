@@ -1,7 +1,5 @@
-package com.example.paymenthistoryservice.dto;
+package com.greentechpay.paymenthistoryservice.dto;
 
-import com.example.paymenthistoryservice.entity.Status;
-import com.example.paymenthistoryservice.entity.TransferType;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +9,7 @@ import java.time.LocalDateTime;
 public class PaymentHistoryDto {
     private Long id;
     private BigDecimal amount;
+    private String userId;
     private String toUser;
     private String serviceName;
     private String senderRequestId;
