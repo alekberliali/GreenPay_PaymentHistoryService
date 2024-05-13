@@ -1,5 +1,8 @@
-package com.example.paymenthistoryservice.entity;
+package com.greentechpay.paymenthistoryservice.entity;
 
+import com.greentechpay.paymenthistoryservice.dto.Currency;
+import com.greentechpay.paymenthistoryservice.dto.Status;
+import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,7 +40,8 @@ public class PaymentHistory {
     private String externalPaymentId;
     @Column(name = "sender_request_id")
     private String senderRequestId;
-    private String currency;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
     @Column(name = "currency_out")
     private String currencyOut;
     @Column(name = "amount_out")
@@ -52,5 +57,5 @@ public class PaymentHistory {
     private String serviceName;
     @Column(name = "category_id")
     private Integer categoryId;
-    private Date date;
+    private LocalDate date;
 }

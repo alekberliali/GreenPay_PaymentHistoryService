@@ -1,4 +1,4 @@
-package com.example.paymenthistoryservice.entity;
+package com.greentechpay.paymenthistoryservice.dto;
 
 public enum TransferType {
     BalanceToBalance,

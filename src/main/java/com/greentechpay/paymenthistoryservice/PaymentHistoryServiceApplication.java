@@ -1,4 +1,4 @@
-package com.example.paymenthistoryservice;
+package com.greentechpay.paymenthistoryservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
