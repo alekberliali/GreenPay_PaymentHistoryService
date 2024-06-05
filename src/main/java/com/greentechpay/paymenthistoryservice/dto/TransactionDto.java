@@ -19,6 +19,5 @@ public class TransactionDto {
     private String toUser;
     private TransferType transferType;
     private String serviceName;
-    private Integer categoryId;
-
+    private String  categoryName;
 }

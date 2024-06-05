@@ -11,7 +11,7 @@ public class PaymentHistoryDto {
     private BigDecimal amount;
     private String userId;
     private String toUser;
-    private String serviceName;
+    private Integer serviceId;
     private String senderRequestId;
     private TransferType transferType;
     private LocalDateTime paymentDate;

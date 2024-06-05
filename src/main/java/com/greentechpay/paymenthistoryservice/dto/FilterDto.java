@@ -6,13 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class FilterDto {
+public class FilterDto<T> {
     private PageRequestDto pageRequestDto;
-    private String userId;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String transactionId;
-    private List<Currency> currencies;
-    private List<TransferType> types;
-    private List<Status> statuses;
+    private T data;
 }

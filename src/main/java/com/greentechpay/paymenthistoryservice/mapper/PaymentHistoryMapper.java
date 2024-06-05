@@ -10,7 +10,5 @@ import org.mapstruct.Mapper;
 public interface PaymentHistoryMapper {
     PaymentHistoryDto entityToDto(PaymentHistory paymentHistory);
 
-    ReceiptDto HistoryToReceiptDto(PaymentHistory paymentHistory);
-
     PaymentHistory dtoToEntity(TransactionDto transactionDto);
 }

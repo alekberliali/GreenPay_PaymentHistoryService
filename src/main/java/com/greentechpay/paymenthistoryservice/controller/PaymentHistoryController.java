@@ -4,9 +4,14 @@ import com.greentechpay.paymenthistoryservice.dto.*;
 import com.greentechpay.paymenthistoryservice.service.PaymentHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,20 +21,10 @@ import java.util.Map;
 public class PaymentHistoryController {
     private final PaymentHistoryService paymentHistoryService;
 
-    @PostMapping("/all")
-    public ResponseEntity<PageResponse<List<PaymentHistoryDto>>> getAll(@RequestBody PageRequestDto pageRequestDto) {
-        return ResponseEntity.ok(paymentHistoryService.getAll(pageRequestDto));
-    }
-
     @PostMapping("/filter")
-    public ResponseEntity<PageResponse<List<PaymentHistoryDto>>> getAllWithFilter(@RequestBody FilterDto filterDto){
+    public ResponseEntity<PageResponse<List<PaymentHistoryDto>>>
+    getAllWithFilter(@RequestBody FilterDto<PaymentHistoryCriteria> filterDto) {
         return ResponseEntity.ok(paymentHistoryService.getAllWithFilter(filterDto));
-    }
-    //TODO BFF services must check validation
-    @PostMapping("/page/{userId}")
-    public ResponseEntity<PageResponse<Map<LocalDate, List<PaymentHistoryDto>>>>
-    getAllWithPageByUserId(@PathVariable String userId, @RequestBody PageRequestDto pageRequestDto) {
-        return ResponseEntity.ok(paymentHistoryService.getAllByUserId(userId, pageRequestDto));
     }
 
     @GetMapping("/sender-request-id/{senderRequestId}")
@@ -41,4 +36,19 @@ public class PaymentHistoryController {
     public ResponseEntity<ReceiptDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentHistoryService.getById(id));
     }
+
+    @PostMapping("/category-statistics")
+    public ResponseEntity<Map<String, BigDecimal>> getCategoryStatistics(@RequestBody StatisticCriteria statisticCriteria) {
+        return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByCategory(statisticCriteria));
+    }
+
+    @PostMapping("/service-statistics")
+    public ResponseEntity<PageResponse<Map<Integer, BigDecimal>>> getServiceStatics(@RequestBody FilterDto<StatisticCriteria> filterDto) {
+        return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByService(filterDto));
+    }
+
+    /*@GetMapping("/download")
+    public void excel(){
+        paymentHistoryService.generateExcel();
+    }*/
 }

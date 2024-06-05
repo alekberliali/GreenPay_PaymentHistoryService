@@ -1,9 +1,6 @@
 package com.greentechpay.paymenthistoryservice.service.specification;
 
-import com.greentechpay.paymenthistoryservice.dto.Currency;
 import com.greentechpay.paymenthistoryservice.dto.PaymentHistoryCriteria;
-import com.greentechpay.paymenthistoryservice.dto.Status;
-import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -34,23 +31,20 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
         if (paymentHistoryCriteria.getStartDate() != null && paymentHistoryCriteria.getEndDate() != null) {
             predicates.add(criteriaBuilder.between(root.get("date"), paymentHistoryCriteria.getStartDate(),
                     paymentHistoryCriteria.getEndDate()));
+        } else if (paymentHistoryCriteria.getStartDate() == null && paymentHistoryCriteria.getEndDate() != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getEndDate()));
+        } else if (paymentHistoryCriteria.getStartDate() != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
         }
         if (paymentHistoryCriteria.getCurrencies() != null) {
-            for (Currency currency : paymentHistoryCriteria.getCurrencies()) {
-                predicates.add(criteriaBuilder.equal(root.get("currency"), currency));
-            }
+            predicates.add(root.get("currency").in(paymentHistoryCriteria.getCurrencies()));
         }
-        if (paymentHistoryCriteria.getTypes() != null) {
-            for (TransferType type : paymentHistoryCriteria.getTypes()) {
-                predicates.add(criteriaBuilder.equal(root.get("transfer_type"), type));
-            }
+        if (paymentHistoryCriteria.getTransferType() != null) {
+            predicates.add(root.get("transferType").in(paymentHistoryCriteria.getTransferType()));
         }
         if (paymentHistoryCriteria.getStatuses() != null) {
-            for (Status status : paymentHistoryCriteria.getStatuses()) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), status));
-            }
+            predicates.add(root.get("status").in(paymentHistoryCriteria.getStatuses()));
         }
-
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

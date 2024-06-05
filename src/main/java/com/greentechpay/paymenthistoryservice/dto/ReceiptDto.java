@@ -13,7 +13,7 @@ public class ReceiptDto {
     private BigDecimal amount;
     private LocalDateTime paymentDate;
     private String senderRequestId;
-    private String name;
+    private Integer serviceId;
     private String from;
     private String to;
     private Currency currency;

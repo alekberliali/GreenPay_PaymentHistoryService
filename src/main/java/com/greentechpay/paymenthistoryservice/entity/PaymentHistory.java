@@ -11,7 +11,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -24,6 +23,7 @@ import java.time.LocalDateTime;
 @Table(name = "payment_history", schema = "public")
 public class PaymentHistory {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal amount;
     @Column(name = "transaction_id")
@@ -33,7 +33,7 @@ public class PaymentHistory {
     @Enumerated(EnumType.STRING)
     private Status status;
     @Column(name = "update_date")
-    private Date updateDate;
+    private LocalDateTime updateDate;
     @Column(name = "try_count")
     private Integer tryCount;
     @Column(name = "external_payment_id")
@@ -45,7 +45,7 @@ public class PaymentHistory {
     @Column(name = "currency_out")
     private String currencyOut;
     @Column(name = "amount_out")
-    private String amountOut;
+    private BigDecimal amountOut;
     @Column(name = "user_id")
     private String userId;
     @Column(name = "to_user")
@@ -54,8 +54,8 @@ public class PaymentHistory {
     @Column(name = "transfer_type")
     private TransferType transferType;
     @Column(name = "service_id")
-    private String serviceName;
-    @Column(name = "category_id")
-    private Integer categoryId;
+    private Integer serviceId;
+    @Column(name = "category_name")
+    private String categoryName;
     private LocalDate date;
 }

@@ -6,12 +6,15 @@ import com.greentechpay.paymenthistoryservice.mapper.CriteriaMapper;
 import com.greentechpay.paymenthistoryservice.mapper.PaymentHistoryMapper;
 import com.greentechpay.paymenthistoryservice.repository.PaymentHistoryRepository;
 import com.greentechpay.paymenthistoryservice.service.specification.PaymentHistorySpecification;
+import com.greentechpay.paymenthistoryservice.service.specification.StatisticSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -21,22 +24,25 @@ public class PaymentHistoryService {
     private final PaymentHistoryMapper paymentHistoryMapper;
     private final CriteriaMapper criteriaMapper;
 
-    public PageResponse<List<PaymentHistoryDto>> getAll(PageRequestDto pageRequestDto) {
-        var pageRequest = PageRequest.of(pageRequestDto.page(), pageRequestDto.size());
-        var result = paymentHistoryRepository.findAllBy(pageRequest);
+    private final ExcelFileService excelFileService;
 
-        return PageResponse.<List<PaymentHistoryDto>>builder()
-                .totalPages(result.getTotalPages())
-                .totalElements(result.getTotalElements())
-                .content(result.getContent().stream()
-                        .map(paymentHistoryMapper::entityToDto)
-                        .toList())
-                .build();
+    @Scheduled(cron = "0 0 4 * * ?")
+    public void generateExcel() {
+        var paymentHistoryList = getAll();
+        try {
+            excelFileService.dataToExcel(paymentHistoryList);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 
-    public PageResponse<List<PaymentHistoryDto>> getAllWithFilter(FilterDto filterDto) {
+    protected List<PaymentHistory> getAll() {
+        return paymentHistoryRepository.findAll();
+    }
+
+    public PageResponse<List<PaymentHistoryDto>> getAllWithFilter(FilterDto<PaymentHistoryCriteria> filterDto) {
         var pageRequest = PageRequest.of(filterDto.getPageRequestDto().page(), filterDto.getPageRequestDto().size());
-        if (filterDto.getUserId().isBlank() || paymentHistoryRepository.existsByUserId(filterDto.getUserId())) {
+        if (filterDto.getData().getUserId() == null || paymentHistoryRepository.existsByUserId(filterDto.getData().getUserId())) {
             var result = paymentHistoryRepository
                     .findAll(new PaymentHistorySpecification(criteriaMapper.filterToCriteria(filterDto)), pageRequest);
 
@@ -47,31 +53,7 @@ public class PaymentHistoryService {
                             .map(paymentHistoryMapper::entityToDto)
                             .toList())
                     .build();
-        } else throw new RuntimeException("user could not find by id: " + filterDto.getUserId());
-    }
-
-    public PageResponse<Map<LocalDate, List<PaymentHistoryDto>>> getAllByUserId(String userId, PageRequestDto pageRequestDto) {
-        if (paymentHistoryRepository.existsByUserId(userId)) {
-            var pageRequest = PageRequest.of(pageRequestDto.page(), pageRequestDto.size());
-            var result = paymentHistoryRepository.findAllByUserId(userId, pageRequest);
-
-            Map<LocalDate, List<PaymentHistoryDto>> resultMap = new HashMap<>();
-            for (PaymentHistory paymentHistory : result.getContent()) {
-                LocalDate date = paymentHistory.getDate();
-                List<PaymentHistoryDto> list = resultMap.getOrDefault(date, new ArrayList<>());
-                list.add(paymentHistoryMapper.entityToDto(paymentHistory));
-                resultMap.put(date, list);
-            }
-
-            Map<LocalDate, List<PaymentHistoryDto>> sortedMap = new TreeMap<>(Collections.reverseOrder());
-            sortedMap.putAll(resultMap);
-
-            return PageResponse.<Map<LocalDate, List<PaymentHistoryDto>>>builder()
-                    .totalElements(result.getTotalElements())
-                    .totalPages(result.getTotalPages())
-                    .content(sortedMap)
-                    .build();
-        } else throw new RuntimeException("user could not find by id: " + userId);
+        } else throw new RuntimeException("user could not find by id: " + filterDto.getData().getUserId());
     }
 
     public ReceiptDto getBySenderRequestId(String senderRequestId) {
@@ -86,16 +68,18 @@ public class PaymentHistoryService {
     public ReceiptDto getById(Long id) {
         PaymentHistory paymentHistory = paymentHistoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("receipt could not find by id: " + id));
+        System.out.println(paymentHistory.getTransferType());
         return getReceiptDto(paymentHistory);
     }
 
+    //TODO serviceId
     private ReceiptDto getReceiptDto(PaymentHistory paymentHistory) {
         if (paymentHistory.getTransferType().equals(TransferType.Payment)) {
             return ReceiptDto.builder()
                     .amount(paymentHistory.getAmount())
                     .paymentDate(paymentHistory.getPaymentDate())
                     .senderRequestId(paymentHistory.getSenderRequestId())
-                    .name(paymentHistory.getServiceName())
+                    .serviceId(paymentHistory.getServiceId())
                     .from(paymentHistory.getUserId())
                     .to(paymentHistory.getToUser())
                     .currency(paymentHistory.getCurrency())
@@ -108,7 +92,6 @@ public class PaymentHistoryService {
                     .amount(paymentHistory.getAmount())
                     .paymentDate(paymentHistory.getPaymentDate())
                     .senderRequestId(paymentHistory.getSenderRequestId())
-                    .name(paymentHistory.getTransferType().name())
                     .from(paymentHistory.getUserId())
                     .to(paymentHistory.getToUser())
                     .currency(paymentHistory.getCurrency())
@@ -118,18 +101,63 @@ public class PaymentHistoryService {
         }
     }
 
-    @KafkaListener(topics = "Transaction-Message-Create", groupId = "1")
+    public Map<String, BigDecimal> getStatisticsWithFilterByCategory(StatisticCriteria statisticCriteria) {
+        List<PaymentHistory> paymentHistoryList = paymentHistoryRepository
+                .findAll(new StatisticSpecification(statisticCriteria));
+
+        Map<String, BigDecimal> categoryPayments = new HashMap<>();
+
+        for (PaymentHistory ph : paymentHistoryList) {
+            BigDecimal amount = ph.getAmount();
+            String categoryName = ph.getCategoryName();
+
+            if (!categoryPayments.containsKey(categoryName)) {
+                categoryPayments.put(categoryName, amount);
+            } else {
+                BigDecimal total = categoryPayments.get(categoryName);
+                total = total.add(ph.getAmount());
+                categoryPayments.put(categoryName, total);
+            }
+        }
+        return categoryPayments;
+    }
+
+    public PageResponse<Map<Integer, BigDecimal>> getStatisticsWithFilterByService(FilterDto<StatisticCriteria> filterDto) {
+        var pageRequest = PageRequest.of(filterDto.getPageRequestDto().page(), filterDto.getPageRequestDto().size());
+        var paymentHistoryList = paymentHistoryRepository
+                .findAll(new StatisticSpecification(filterDto.getData()), pageRequest);
+
+        Map<Integer, BigDecimal> servicePayments = new HashMap<>();
+
+        for (PaymentHistory ph : paymentHistoryList) {
+            BigDecimal amount = ph.getAmount();
+            Integer serviceId = ph.getServiceId();
+
+            if (!servicePayments.containsKey(serviceId)) {
+                servicePayments.put(serviceId, amount);
+            } else {
+                BigDecimal total = servicePayments.get(serviceId);
+                total = total.add(ph.getAmount());
+                servicePayments.put(serviceId, total);
+            }
+        }
+        return PageResponse.<Map<Integer, BigDecimal>>builder()
+                .totalPages(paymentHistoryList.getTotalPages())
+                .totalElements(paymentHistoryList.getTotalElements())
+                .content(servicePayments)
+                .build();
+    }
+
+    // @KafkaListener(topics = "Transaction-Message-Create", groupId = "1")
     private void create(TransactionDto transactionDto) {
         paymentHistoryRepository.save(paymentHistoryMapper.dtoToEntity(transactionDto));
     }
 
-    @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
+    // @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
     private void update(PaymentStatusUpdate paymentStatusUpdate) {
-        if (paymentHistoryRepository.existsByTransactionId(paymentStatusUpdate.getTransactionId())) {
-            var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
-            paymentHistory.setStatus(paymentStatusUpdate.getStatus());
-            paymentHistoryRepository.save(paymentHistory);
-        } else
-            throw new RuntimeException("Transaction could not find by id: " + paymentStatusUpdate.getTransactionId());
+        var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
+        paymentHistory.setStatus(paymentStatusUpdate.getStatus());
+        paymentHistory.setUpdateDate(LocalDateTime.now());
+        paymentHistoryRepository.save(paymentHistory);
     }
 }
