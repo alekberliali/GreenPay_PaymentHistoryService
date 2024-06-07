@@ -11,6 +11,8 @@ public class PaymentHistoryCriteria {
     private LocalDate startDate;
     private LocalDate endDate;
     private String transactionId;
+    private Integer vendorId;
+    private String requestField;
     private List<Currency> currencies;
     private List<TransferType> transferType;
     private List<Status> statuses;

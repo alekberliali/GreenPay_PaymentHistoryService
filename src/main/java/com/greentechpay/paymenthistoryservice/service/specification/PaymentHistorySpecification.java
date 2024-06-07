@@ -21,29 +21,32 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
     public Predicate toPredicate(Root<PaymentHistory> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 
         List<Predicate> predicates = new ArrayList<>();
-
-        if (paymentHistoryCriteria.getUserId() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("userId"), paymentHistoryCriteria.getUserId()));
-        }
-        if (paymentHistoryCriteria.getTransactionId() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("transactionId"), paymentHistoryCriteria.getTransactionId()));
-        }
-        if (paymentHistoryCriteria.getStartDate() != null && paymentHistoryCriteria.getEndDate() != null) {
-            predicates.add(criteriaBuilder.between(root.get("date"), paymentHistoryCriteria.getStartDate(),
-                    paymentHistoryCriteria.getEndDate()));
-        } else if (paymentHistoryCriteria.getStartDate() == null && paymentHistoryCriteria.getEndDate() != null) {
-            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getEndDate()));
-        } else if (paymentHistoryCriteria.getStartDate() != null) {
-            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
-        }
-        if (paymentHistoryCriteria.getCurrencies() != null) {
-            predicates.add(root.get("currency").in(paymentHistoryCriteria.getCurrencies()));
-        }
-        if (paymentHistoryCriteria.getTransferType() != null) {
-            predicates.add(root.get("transferType").in(paymentHistoryCriteria.getTransferType()));
-        }
-        if (paymentHistoryCriteria.getStatuses() != null) {
-            predicates.add(root.get("status").in(paymentHistoryCriteria.getStatuses()));
+        if (paymentHistoryCriteria != null) {
+            if (paymentHistoryCriteria.getUserId() != null) {
+                var senderPredicate = criteriaBuilder.equal(root.get("userId"), paymentHistoryCriteria.getUserId());
+                var receiverPredicate = criteriaBuilder.equal(root.get("toUser"), paymentHistoryCriteria.getUserId());
+                predicates.add(criteriaBuilder.or(senderPredicate, receiverPredicate));
+            }
+            if (paymentHistoryCriteria.getTransactionId() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("transactionId"), paymentHistoryCriteria.getTransactionId()));
+            }
+            if (paymentHistoryCriteria.getStartDate() != null && paymentHistoryCriteria.getEndDate() != null) {
+                predicates.add(criteriaBuilder.between(root.get("date"), paymentHistoryCriteria.getStartDate(),
+                        paymentHistoryCriteria.getEndDate()));
+            } else if (paymentHistoryCriteria.getStartDate() == null && paymentHistoryCriteria.getEndDate() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getEndDate()));
+            } else if (paymentHistoryCriteria.getStartDate() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
+            }
+            if (paymentHistoryCriteria.getCurrencies() != null) {
+                predicates.add(root.get("currency").in(paymentHistoryCriteria.getCurrencies()));
+            }
+            if (paymentHistoryCriteria.getTransferType() != null) {
+                predicates.add(root.get("transferType").in(paymentHistoryCriteria.getTransferType()));
+            }
+            if (paymentHistoryCriteria.getStatuses() != null) {
+                predicates.add(root.get("status").in(paymentHistoryCriteria.getStatuses()));
+            }
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }

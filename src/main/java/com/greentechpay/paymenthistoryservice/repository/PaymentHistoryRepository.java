@@ -9,13 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Long>,
         JpaSpecificationExecutor<PaymentHistory> {
 
-    Page<PaymentHistory> findAllBy(PageRequest pageRequest, Specification<PaymentHistorySpecification> specification);
+    List<PaymentHistory> findAllByDate(LocalDate date);
 
     @Query("select receipt from PaymentHistory receipt where receipt.senderRequestId=:senderRequestId")
     PaymentHistory findSenderRequestId(String senderRequestId);

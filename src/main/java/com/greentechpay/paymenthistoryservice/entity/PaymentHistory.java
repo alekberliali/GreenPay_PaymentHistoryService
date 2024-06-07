@@ -50,6 +50,10 @@ public class PaymentHistory {
     private String userId;
     @Column(name = "to_user")
     private String toUser;
+    @Column(name = "vendor_id")
+    private Integer vendorId;
+    @Column(name = "request_field")
+    private String requestField;
     @Enumerated(EnumType.STRING)
     @Column(name = "transfer_type")
     private TransferType transferType;

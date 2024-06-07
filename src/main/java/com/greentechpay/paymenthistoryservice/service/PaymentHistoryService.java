@@ -2,7 +2,6 @@ package com.greentechpay.paymenthistoryservice.service;
 
 import com.greentechpay.paymenthistoryservice.dto.*;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
-import com.greentechpay.paymenthistoryservice.mapper.CriteriaMapper;
 import com.greentechpay.paymenthistoryservice.mapper.PaymentHistoryMapper;
 import com.greentechpay.paymenthistoryservice.repository.PaymentHistoryRepository;
 import com.greentechpay.paymenthistoryservice.service.specification.PaymentHistorySpecification;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -22,8 +22,6 @@ import java.util.*;
 public class PaymentHistoryService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentHistoryMapper paymentHistoryMapper;
-    private final CriteriaMapper criteriaMapper;
-
     private final ExcelFileService excelFileService;
 
     @Scheduled(cron = "0 0 4 * * ?")
@@ -37,23 +35,21 @@ public class PaymentHistoryService {
     }
 
     protected List<PaymentHistory> getAll() {
-        return paymentHistoryRepository.findAll();
+        return paymentHistoryRepository.findAllByDate(LocalDate.now().minusDays(1));
     }
 
     public PageResponse<List<PaymentHistoryDto>> getAllWithFilter(FilterDto<PaymentHistoryCriteria> filterDto) {
         var pageRequest = PageRequest.of(filterDto.getPageRequestDto().page(), filterDto.getPageRequestDto().size());
-        if (filterDto.getData().getUserId() == null || paymentHistoryRepository.existsByUserId(filterDto.getData().getUserId())) {
-            var result = paymentHistoryRepository
-                    .findAll(new PaymentHistorySpecification(criteriaMapper.filterToCriteria(filterDto)), pageRequest);
+        var result = paymentHistoryRepository
+                .findAll(new PaymentHistorySpecification(filterDto.getData()), pageRequest);
 
-            return PageResponse.<List<PaymentHistoryDto>>builder()
-                    .totalPages(result.getTotalPages())
-                    .totalElements(result.getTotalElements())
-                    .content(result.getContent().stream()
-                            .map(paymentHistoryMapper::entityToDto)
-                            .toList())
-                    .build();
-        } else throw new RuntimeException("user could not find by id: " + filterDto.getData().getUserId());
+        return PageResponse.<List<PaymentHistoryDto>>builder()
+                .totalPages(result.getTotalPages())
+                .totalElements(result.getTotalElements())
+                .content(result.getContent().stream()
+                        .map(paymentHistoryMapper::entityToDto)
+                        .toList())
+                .build();
     }
 
     public ReceiptDto getBySenderRequestId(String senderRequestId) {
@@ -72,7 +68,6 @@ public class PaymentHistoryService {
         return getReceiptDto(paymentHistory);
     }
 
-    //TODO serviceId
     private ReceiptDto getReceiptDto(PaymentHistory paymentHistory) {
         if (paymentHistory.getTransferType().equals(TransferType.Payment)) {
             return ReceiptDto.builder()

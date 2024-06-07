@@ -16,8 +16,10 @@ public class TransactionDto {
     private String currencyOut;
     private String amountOut;
     private String userId;
+    private Integer vendorId;
     private String toUser;
+    private String requestField;
     private TransferType transferType;
     private String serviceName;
-    private String  categoryName;
+    private String categoryName;
 }
