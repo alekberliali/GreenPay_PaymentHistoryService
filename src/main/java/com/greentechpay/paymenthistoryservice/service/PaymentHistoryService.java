@@ -8,6 +8,7 @@ import com.greentechpay.paymenthistoryservice.service.specification.PaymentHisto
 import com.greentechpay.paymenthistoryservice.service.specification.StatisticSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -143,12 +144,12 @@ public class PaymentHistoryService {
                 .build();
     }
 
-    // @KafkaListener(topics = "Transaction-Message-Create", groupId = "1")
-    private void create(TransactionDto transactionDto) {
-        paymentHistoryRepository.save(paymentHistoryMapper.dtoToEntity(transactionDto));
+    @KafkaListener(topics = "Transaction-Message-Create", groupId = "1")
+    private void create(PaymentSuccessEvent<TransactionDto> transactionDto) {
+        paymentHistoryRepository.save(paymentHistoryMapper.dtoToEntity(transactionDto.getResponse()));
     }
 
-    // @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
+    @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
     private void update(PaymentStatusUpdate paymentStatusUpdate) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
         paymentHistory.setStatus(paymentStatusUpdate.getStatus());
