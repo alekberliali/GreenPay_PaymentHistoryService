@@ -1,14 +1,20 @@
 package com.greentechpay.paymenthistoryservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
-public class TransactionDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TResponse {
     private BigDecimal amount;
-    private LocalDateTime paymentDate;
+    private String transactionId;
+    private Timestamp paymentDate;
+    private String merchantId;
+    private Timestamp updatedDate;
     private Status status;
     private String externalPaymentId;
     private String senderRequestId;
@@ -20,6 +26,6 @@ public class TransactionDto {
     private String toUser;
     private String requestField;
     private TransferType transferType;
-    private String serviceName;
+    private Integer serviceId;
     private String categoryName;
 }

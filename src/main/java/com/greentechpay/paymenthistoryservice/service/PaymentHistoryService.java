@@ -70,7 +70,7 @@ public class PaymentHistoryService {
     }
 
     private ReceiptDto getReceiptDto(PaymentHistory paymentHistory) {
-        if (paymentHistory.getTransferType().equals(TransferType.Payment)) {
+        if (paymentHistory.getTransferType().equals(TransferType.BillingPayment)) {
             return ReceiptDto.builder()
                     .amount(paymentHistory.getAmount())
                     .paymentDate(paymentHistory.getPaymentDate())
@@ -144,12 +144,14 @@ public class PaymentHistoryService {
                 .build();
     }
 
-    @KafkaListener(topics = "Transaction-Message-Create", groupId = "1")
-    private void create(PaymentSuccessEvent<TransactionDto> transactionDto) {
+    @KafkaListener(topics = "payment-success-saga")
+    private void create(PaymentSuccessEvent<TResponse> transactionDto) {
+        System.out.println(transactionDto.getResponse().getAmount());
+
         paymentHistoryRepository.save(paymentHistoryMapper.dtoToEntity(transactionDto.getResponse()));
     }
 
-    @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
+    //@KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
     private void update(PaymentStatusUpdate paymentStatusUpdate) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
         paymentHistory.setStatus(paymentStatusUpdate.getStatus());
