@@ -59,7 +59,13 @@ public class PaymentHistory {
     private TransferType transferType;
     @Column(name = "service_id")
     private Integer serviceId;
+    @Column(name = "merchant_id")
+    private Integer merchantId;
     @Column(name = "category_name")
     private String categoryName;
+    @Column(name = "sender_iban")
+    private String senderIban;
+    @Column(name = "receiver_iban")
+    private String receiverIban;
     private LocalDate date;
 }

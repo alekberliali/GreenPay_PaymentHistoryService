@@ -118,6 +118,26 @@ public class PaymentHistoryService {
         return categoryPayments;
     }
 
+    public Map<Integer, BigDecimal> getStatisticsWithFilterByMerchant(StatisticCriteria statisticCriteria) {
+        List<PaymentHistory> paymentHistoryList = paymentHistoryRepository
+                .findAll(new StatisticSpecification(statisticCriteria));
+        Map<Integer, BigDecimal> merchantPayments = new HashMap<>();
+
+        for (PaymentHistory ph : paymentHistoryList) {
+            BigDecimal amount = ph.getAmount();
+            Integer merchantId = ph.getMerchantId();
+
+            if (!merchantPayments.containsKey(merchantId)) {
+                merchantPayments.put(merchantId, amount);
+            } else {
+                BigDecimal total = merchantPayments.get(merchantId);
+                total = total.add(ph.getAmount());
+                merchantPayments.put(merchantId, total);
+            }
+        }
+        return merchantPayments;
+    }
+
     public PageResponse<Map<Integer, BigDecimal>> getStatisticsWithFilterByService(FilterDto<StatisticCriteria> filterDto) {
         var pageRequest = PageRequest.of(filterDto.getPageRequestDto().page(), filterDto.getPageRequestDto().size());
         var paymentHistoryList = paymentHistoryRepository
@@ -144,14 +164,15 @@ public class PaymentHistoryService {
                 .build();
     }
 
+
     @KafkaListener(topics = "payment-success-saga")
     private void create(PaymentSuccessEvent<TResponse> transactionDto) {
-        System.out.println(transactionDto.getResponse().getAmount());
-
-        paymentHistoryRepository.save(paymentHistoryMapper.dtoToEntity(transactionDto.getResponse()));
+        var ph = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
+        ph.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
+        paymentHistoryRepository.save(ph);
     }
 
-    //@KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
+    @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
     private void update(PaymentStatusUpdate paymentStatusUpdate) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
         paymentHistory.setStatus(paymentStatusUpdate.getStatus());

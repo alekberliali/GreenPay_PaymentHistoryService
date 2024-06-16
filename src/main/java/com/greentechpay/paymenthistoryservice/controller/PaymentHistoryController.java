@@ -47,8 +47,8 @@ public class PaymentHistoryController {
         return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByService(filterDto));
     }
 
-    /*@GetMapping("/download")
-    public void excel(){
-        paymentHistoryService.generateExcel();
-    }*/
+    @PostMapping("/merchant-statistics")
+    public ResponseEntity<Map<Integer, BigDecimal>> getMerchantStatistics(@RequestBody StatisticCriteria statisticCriteria) {
+        return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByMerchant(statisticCriteria));
+    }
 }

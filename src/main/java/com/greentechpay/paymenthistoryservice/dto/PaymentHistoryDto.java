@@ -14,7 +14,10 @@ public class PaymentHistoryDto {
     private String toUser;
     private String requestField;
     private Integer serviceId;
+    private Integer merchantId;
     private String senderRequestId;
+    private String senderIban;
+    private String receiverIban;
     private TransferType transferType;
     private LocalDateTime paymentDate;
     private String transactionId;

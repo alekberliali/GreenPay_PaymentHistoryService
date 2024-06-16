@@ -27,6 +27,11 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
                 var receiverPredicate = criteriaBuilder.equal(root.get("toUser"), paymentHistoryCriteria.getUserId());
                 predicates.add(criteriaBuilder.or(senderPredicate, receiverPredicate));
             }
+            if (paymentHistoryCriteria.getSenderIban() != null) {
+                var senderIbanPredicate = criteriaBuilder.equal(root.get("senderIban"), paymentHistoryCriteria.getSenderIban());
+                var receiverIbanPredicate = criteriaBuilder.equal(root.get("receiverIban"), paymentHistoryCriteria.getSenderIban());
+                predicates.add(criteriaBuilder.or(senderIbanPredicate, receiverIbanPredicate));
+            }
             if (paymentHistoryCriteria.getTransactionId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("transactionId"), paymentHistoryCriteria.getTransactionId()));
             }
