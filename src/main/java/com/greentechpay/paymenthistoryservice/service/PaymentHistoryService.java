@@ -9,6 +9,7 @@ import com.greentechpay.paymenthistoryservice.service.specification.StatisticSpe
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class PaymentHistoryService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentHistoryMapper paymentHistoryMapper;
     private final ExcelFileService excelFileService;
+    private final NotificationSendService notificationSendService;
 
     @Scheduled(cron = "0 0 4 * * ?")
     public void generateExcel() {
@@ -52,7 +54,7 @@ public class PaymentHistoryService {
                         .toList())
                 .build();
     }
-
+/*
     public ReceiptDto getBySenderRequestId(String senderRequestId) {
         try {
             PaymentHistory paymentHistory = paymentHistoryRepository.findSenderRequestId(senderRequestId);
@@ -60,15 +62,14 @@ public class PaymentHistoryService {
         } catch (RuntimeException e) {
             throw new RuntimeException("receipt could not find by sender request id: " + senderRequestId);
         }
-    }
+    }*/
 
-    public ReceiptDto getById(Long id) {
+    public PaymentHistoryDto getById(Long id) {
         PaymentHistory paymentHistory = paymentHistoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("receipt could not find by id: " + id));
-        System.out.println(paymentHistory.getTransferType());
-        return getReceiptDto(paymentHistory);
+        return paymentHistoryMapper.entityToDto(paymentHistory);
     }
-
+/*
     private ReceiptDto getReceiptDto(PaymentHistory paymentHistory) {
         if (paymentHistory.getTransferType().equals(TransferType.BillingPayment)) {
             return ReceiptDto.builder()
@@ -95,6 +96,25 @@ public class PaymentHistoryService {
                     .status(paymentHistory.getStatus())
                     .build();
         }
+    }*/
+
+    public Map<LocalDate, BigDecimal> getCategoryStatisticsByCategoryName(StatisticCriteria statisticCriteria) {
+        List<PaymentHistory> paymentHistoryList = paymentHistoryRepository
+                .findAll(new StatisticSpecification(statisticCriteria));
+        Map<LocalDate, BigDecimal> categoryStatistics = new HashMap<>();
+        for (PaymentHistory ph : paymentHistoryList) {
+            BigDecimal amount = ph.getAmount();
+            LocalDate date = ph.getDate();
+
+            if (!categoryStatistics.containsKey(date)) {
+                categoryStatistics.put(date, amount);
+            } else {
+                BigDecimal total = categoryStatistics.get(date);
+                total = total.add(ph.getAmount());
+                categoryStatistics.put(date, total);
+            }
+        }
+        return categoryStatistics;
     }
 
     public Map<String, BigDecimal> getStatisticsWithFilterByCategory(StatisticCriteria statisticCriteria) {
@@ -158,24 +178,26 @@ public class PaymentHistoryService {
             }
         }
         return PageResponse.<Map<Integer, BigDecimal>>builder()
-                .totalPages(paymentHistoryList.getTotalPages())
-                .totalElements(paymentHistoryList.getTotalElements())
+                .totalPages(servicePayments.keySet().size() / filterDto.getPageRequestDto().size())
+                .totalElements((long) servicePayments.keySet().size())
                 .content(servicePayments)
                 .build();
     }
 
 
-    @KafkaListener(topics = "payment-success-saga")
+    @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
     private void create(PaymentSuccessEvent<TResponse> transactionDto) {
         var ph = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
         ph.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
         paymentHistoryRepository.save(ph);
+        notificationSendService.sendPaymentCreateNotification(ph);
     }
 
-    @KafkaListener(topics = "Transaction-Message-Update", groupId = "1")
-    private void update(PaymentStatusUpdate paymentStatusUpdate) {
-        var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentStatusUpdate.getTransactionId());
-        paymentHistory.setStatus(paymentStatusUpdate.getStatus());
+    @KafkaListener(topics = "payment-update-saga", containerFactory = "kafkaUpdateListenerContainerFactory")
+    private void update(PaymentUpdateEvent paymentUpdateEvent) {
+        var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentUpdateEvent.getTransactionId());
+        notificationSendService.sendPaymentUpdateNotification(paymentHistory, paymentUpdateEvent);
+        paymentHistory.setStatus(paymentUpdateEvent.getStatus());
         paymentHistory.setUpdateDate(LocalDateTime.now());
         paymentHistoryRepository.save(paymentHistory);
     }

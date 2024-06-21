@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class ExcelFileService {
     protected void dataToExcel(List<PaymentHistory> paymentHistoryList) throws IOException {
-        File file = new File("C:\\Users\\Ali\\Desktop\\PaymentHistory.xlsx");
+        File file = new File("/home/documents/PaymentHistory.xlsx");
         Workbook workbook;
         Sheet sheet;
 
@@ -51,7 +51,7 @@ public class ExcelFileService {
             row.createCell(6).setCellValue(ph.getTransferType().toString());
             row.createCell(7).setCellValue(ph.getStatus().toString());
         }
-        try (FileOutputStream fileOutputStream = new FileOutputStream("C:\\Users\\Ali\\Desktop\\PaymentHistory.xlsx")) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream("/home/documents/PaymentHistory.xlsx")) {
             workbook.write(fileOutputStream);
         }
         workbook.close();

@@ -1,11 +1,13 @@
 package com.greentechpay.paymenthistoryservice.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class PaymentHistoryDto {
     private Long id;
     private BigDecimal amount;
@@ -13,6 +15,7 @@ public class PaymentHistoryDto {
     private Integer vendorId;
     private String toUser;
     private String requestField;
+    private String externalPaymentId;
     private Integer serviceId;
     private Integer merchantId;
     private String senderRequestId;
@@ -21,5 +24,6 @@ public class PaymentHistoryDto {
     private TransferType transferType;
     private LocalDateTime paymentDate;
     private String transactionId;
+    private Currency currency;
     private Status status;
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class PaymentHistoryCriteria {
+    private Long id;
     private String userId;
     private LocalDate startDate;
     private LocalDate endDate;

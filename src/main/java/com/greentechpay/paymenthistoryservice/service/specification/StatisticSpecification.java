@@ -25,6 +25,12 @@ public class StatisticSpecification implements Specification<PaymentHistory> {
         if (statisticCriteria.getUserId() != null) {
             predicates.add(criteriaBuilder.equal(root.get("userId"), statisticCriteria.getUserId()));
         }
+        if (statisticCriteria.getCategoryName() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("categoryName"), statisticCriteria.getCategoryName()));
+        }
+        if (statisticCriteria.getVendorId() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("vendorId"), statisticCriteria.getVendorId()));
+        }
         if (statisticCriteria.getStartDate() != null && statisticCriteria.getEndDate() != null) {
             predicates.add(criteriaBuilder.between(root.get("date"), statisticCriteria.getStartDate(),
                     statisticCriteria.getEndDate()));

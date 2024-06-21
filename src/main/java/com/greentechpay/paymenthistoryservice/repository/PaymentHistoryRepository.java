@@ -25,6 +25,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     @Query("select receipt from PaymentHistory receipt where receipt.id=:id")
     Optional<PaymentHistory> findById(Long id);
 
+    @Query("select ph from PaymentHistory  ph where ph.transactionId=:id")
     PaymentHistory findByTransactionId(String id);
 
     boolean existsByUserId(String id);
