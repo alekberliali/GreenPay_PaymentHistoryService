@@ -1,5 +1,4 @@
-package com.greentechpay.paymenthistoryservice.dto;
-
+package com.greentechpay.paymenthistoryservice.kafka.dto;
 import lombok.Data;
 
 @Data

@@ -4,5 +4,6 @@ public enum Currency {
     AZN,
     EUR,
     USD,
-    RUB
+    RUB,
+    NONE
 }

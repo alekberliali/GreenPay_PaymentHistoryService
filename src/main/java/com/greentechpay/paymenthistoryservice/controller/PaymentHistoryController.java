@@ -57,8 +57,8 @@ public class PaymentHistoryController {
     }
 
     @PostMapping("/service-statistics")
-    public ResponseEntity<PageResponse<Map<Integer, BigDecimal>>> getServiceStatics(@RequestBody FilterDto<StatisticCriteria> filterDto) {
-        return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByService(filterDto));
+    public ResponseEntity<Map<Integer, BigDecimal>> getServiceStatics(@RequestBody StatisticCriteria statisticCriteria) {
+        return ResponseEntity.ok(paymentHistoryService.getStatisticsWithFilterByService(statisticCriteria));
     }
 
     @PostMapping("/merchant-statistics")

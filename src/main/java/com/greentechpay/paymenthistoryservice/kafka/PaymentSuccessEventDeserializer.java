@@ -2,8 +2,8 @@ package com.greentechpay.paymenthistoryservice.kafka;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greentechpay.paymenthistoryservice.dto.PaymentSuccessEvent;
-import com.greentechpay.paymenthistoryservice.dto.TResponse;
+import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentSuccessEvent;
+import com.greentechpay.paymenthistoryservice.kafka.dto.TResponse;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.context.annotation.Configuration;

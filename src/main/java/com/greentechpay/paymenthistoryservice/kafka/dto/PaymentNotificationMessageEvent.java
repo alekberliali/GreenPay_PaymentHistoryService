@@ -1,6 +1,7 @@
-package com.greentechpay.paymenthistoryservice.dto;
+package com.greentechpay.paymenthistoryservice.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.greentechpay.paymenthistoryservice.dto.Body;
 import lombok.Builder;
 import lombok.Data;
 

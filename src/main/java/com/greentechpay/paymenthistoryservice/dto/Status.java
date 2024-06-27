@@ -3,6 +3,9 @@ package com.greentechpay.paymenthistoryservice.dto;
 
 public enum Status {
     Created,
+    Fail,
+    Success,
+    Pending,
     TransactinCreated,
     SendingToVendor,
     CreatedAtVendor,

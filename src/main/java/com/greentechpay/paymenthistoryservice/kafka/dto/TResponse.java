@@ -1,11 +1,14 @@
-package com.greentechpay.paymenthistoryservice.dto;
+package com.greentechpay.paymenthistoryservice.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.greentechpay.paymenthistoryservice.dto.Currency;
+import com.greentechpay.paymenthistoryservice.dto.Status;
+import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -20,7 +23,7 @@ public class TResponse {
     private String senderRequestId;
     private Currency currency;
     private String currencyOut;
-    private String amountOut;
+    private BigDecimal amountOut;
     private String userId;
     private Integer vendorId;
     private String toUser;

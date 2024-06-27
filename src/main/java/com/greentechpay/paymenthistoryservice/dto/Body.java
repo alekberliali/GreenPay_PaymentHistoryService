@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Body {
     private BigDecimal amount;
-    private String currency;
+    private Currency currency;
     private String requestField;
     private LocalDateTime date;
     private String description;

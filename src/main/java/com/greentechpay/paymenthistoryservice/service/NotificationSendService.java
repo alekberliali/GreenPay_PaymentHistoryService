@@ -1,8 +1,9 @@
 package com.greentechpay.paymenthistoryservice.service;
 
 import com.greentechpay.paymenthistoryservice.dto.Body;
-import com.greentechpay.paymenthistoryservice.dto.PaymentNotificationMessageEvent;
-import com.greentechpay.paymenthistoryservice.dto.PaymentUpdateEvent;
+import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentNotificationMessageEvent;
+import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentUpdateEvent;
+import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,25 +15,31 @@ public class NotificationSendService {
     private final KafkaTemplate<String, PaymentNotificationMessageEvent> kafkaTemplate;
 
     protected void sendPaymentCreateNotification(PaymentHistory paymentHistory) {
-        var body = Body.builder()
+        var senderBody = Body.builder()
                 .amount(paymentHistory.getAmount())
-                .currency(paymentHistory.getCurrency().toString())
+                .currency(paymentHistory.getCurrency())
+                .date(paymentHistory.getPaymentDate())
+                .requestField(paymentHistory.getRequestField())
+                .build();
+        var receiverBody = Body.builder()
+                .amount(paymentHistory.getAmountOut())
+                .currency(paymentHistory.getCurrencyOut())
                 .date(paymentHistory.getPaymentDate())
                 .build();
         PaymentNotificationMessageEvent message;
-        if (paymentHistory.getToUser() != null) {
+        if (paymentHistory.getTransferType().equals(TransferType.BalanceToBalance)) {
             message = PaymentNotificationMessageEvent.builder()
                     .Title(paymentHistory.getTransferType().toString())
                     .UserId(paymentHistory.getUserId())
-                    .Body(body)
+                    .Body(senderBody)
                     .ReceiverUserId(paymentHistory.getToUser())
-                    .ReceiverBody(body)
+                    .ReceiverBody(receiverBody)
                     .build();
         } else {
             message = PaymentNotificationMessageEvent.builder()
                     .Title(paymentHistory.getTransferType().toString())
                     .UserId(paymentHistory.getUserId())
-                    .Body(body)
+                    .Body(senderBody)
                     .build();
         }
         kafkaTemplate.send("Notification-Message", message);
