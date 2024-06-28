@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling
 public class PaymentHistoryServiceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(PaymentHistoryServiceApplication.class, args);
     }

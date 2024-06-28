@@ -63,7 +63,7 @@ public class PaymentHistory {
     @Column(name = "service_id")
     private Integer serviceId;
     @Column(name = "merchant_id")
-    private Integer merchantId;
+    private Long merchantId;
     @Column(name = "category_name")
     private String categoryName;
     @Column(name = "sender_iban")

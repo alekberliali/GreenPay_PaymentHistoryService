@@ -17,7 +17,7 @@ public class PaymentHistoryDto {
     private String requestField;
     private String externalPaymentId;
     private Integer serviceId;
-    private Integer merchantId;
+    private Long merchantId;
     private String senderRequestId;
     private String senderIban;
     private String receiverIban;

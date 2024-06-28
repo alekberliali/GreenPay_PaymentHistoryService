@@ -142,14 +142,14 @@ public class PaymentHistoryService {
         return categoryPayments;
     }
 
-    public Map<Integer, BigDecimal> getStatisticsWithFilterByMerchant(StatisticCriteria statisticCriteria) {
+    public Map<Long, BigDecimal> getStatisticsWithFilterByMerchant(StatisticCriteria statisticCriteria) {
         List<PaymentHistory> paymentHistoryList = paymentHistoryRepository
                 .findAll(new StatisticSpecification(statisticCriteria));
-        Map<Integer, BigDecimal> merchantPayments = new HashMap<>();
+        Map<Long, BigDecimal> merchantPayments = new HashMap<>();
 
         for (PaymentHistory ph : paymentHistoryList) {
             BigDecimal amount = ph.getAmount();
-            Integer merchantId = ph.getMerchantId();
+            Long merchantId = ph.getMerchantId();
 
             if (!merchantPayments.containsKey(merchantId)) {
                 merchantPayments.put(merchantId, amount);
@@ -213,7 +213,7 @@ public class PaymentHistoryService {
         notificationSendService.sendPaymentCreateNotification(paymentHistory);
     }
 
-   @KafkaListener(topics = "balanceToBalance-payment-history-updated-message", containerFactory = "kafkaUpdateListenerContainerFactory")
+    @KafkaListener(topics = "balanceToBalance-payment-history-updated-message", containerFactory = "kafkaUpdateListenerContainerFactory")
     public void updateBalanceToBalance(PaymentUpdateEvent paymentUpdateEvent) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentUpdateEvent.getTransactionId());
         paymentHistory.setAmountOut(paymentUpdateEvent.getAmountOut());
