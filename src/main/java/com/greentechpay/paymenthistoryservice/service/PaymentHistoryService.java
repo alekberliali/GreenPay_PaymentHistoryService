@@ -203,9 +203,9 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "balanceToBalance-payment-history-created-message", containerFactory = "kafkaListenerContainerFactoryBalanceToBalance")
     public void createBalanceToBalance(CreateBalanceToBalance transactionDto) {
         var paymentHistory = paymentHistoryMapper.balanceToBalanceToEntity(transactionDto);
-        paymentHistory.setCurrency(Currency.valueOf(transactionDto.getCurrency()));
-        if (!transactionDto.getCurrencyOut().equals("")) {
-            paymentHistory.setCurrencyOut(Currency.valueOf(transactionDto.getCurrencyOut()));
+        paymentHistory.setCurrency(transactionDto.getCurrency());
+        if (!transactionDto.getCurrencyOut().equals(Currency.NONE)) {
+            paymentHistory.setCurrencyOut(transactionDto.getCurrencyOut());
         }
         paymentHistory.setDate(transactionDto.getPaymentDate().toLocalDateTime().toLocalDate());
         paymentHistory.setCategoryName("Transfer");
@@ -217,10 +217,12 @@ public class PaymentHistoryService {
     public void updateBalanceToBalance(PaymentUpdateEvent paymentUpdateEvent) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(paymentUpdateEvent.getTransactionId());
         paymentHistory.setAmountOut(paymentUpdateEvent.getAmountOut());
-        paymentHistory.setCurrencyOut(Currency.valueOf(paymentUpdateEvent.getCurrencyOut()));
+        paymentHistory.setCurrencyOut(paymentUpdateEvent.getCurrencyOut());
         paymentHistory.setUpdateDate(LocalDateTime.now());
         paymentHistory.setStatus(paymentUpdateEvent.getStatus());
         paymentHistory.setReceiverIban(paymentUpdateEvent.getReceiverIban());
         paymentHistoryRepository.save(paymentHistory);
     }
+
+
 }

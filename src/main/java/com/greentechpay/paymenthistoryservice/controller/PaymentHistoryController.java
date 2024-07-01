@@ -3,7 +3,6 @@ package com.greentechpay.paymenthistoryservice.controller;
 import com.greentechpay.paymenthistoryservice.dto.*;
 import com.greentechpay.paymenthistoryservice.service.PaymentHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

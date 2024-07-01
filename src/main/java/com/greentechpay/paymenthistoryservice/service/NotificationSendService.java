@@ -20,11 +20,13 @@ public class NotificationSendService {
                 .currency(paymentHistory.getCurrency())
                 .date(paymentHistory.getPaymentDate())
                 .requestField(paymentHistory.getRequestField())
+                .description(paymentHistory.getStatus().toString())
                 .build();
         var receiverBody = Body.builder()
                 .amount(paymentHistory.getAmountOut())
                 .currency(paymentHistory.getCurrencyOut())
                 .date(paymentHistory.getPaymentDate())
+                .description(paymentHistory.getStatus().toString())
                 .build();
         PaymentNotificationMessageEvent message;
         if (paymentHistory.getTransferType().equals(TransferType.BalanceToBalance)) {

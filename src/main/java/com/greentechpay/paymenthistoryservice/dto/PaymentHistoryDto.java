@@ -24,6 +24,7 @@ public class PaymentHistoryDto {
     private TransferType transferType;
     private LocalDateTime paymentDate;
     private String transactionId;
+    private String categoryName;
     private Currency currency;
     private Status status;
 }

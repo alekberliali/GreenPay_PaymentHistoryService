@@ -2,6 +2,7 @@ package com.greentechpay.paymenthistoryservice.kafka.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.greentechpay.paymenthistoryservice.dto.Currency;
 import com.greentechpay.paymenthistoryservice.dto.Status;
 import lombok.Data;
 
@@ -14,11 +15,11 @@ public class CreateBalanceToBalance {
     private BigDecimal amount;
     private String transactionId;
     private Timestamp paymentDate;
-    private Integer merchantId;
+    private Long merchantId;
     private Status status;
     private String senderRequestId;
-    private String currency;
-    private String currencyOut;
+    private Currency currency;
+    private Currency currencyOut;
     private BigDecimal amountOut;
     private String requestField;
     private String senderIban;

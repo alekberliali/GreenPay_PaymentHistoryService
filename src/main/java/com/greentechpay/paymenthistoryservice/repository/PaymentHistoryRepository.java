@@ -1,17 +1,17 @@
 package com.greentechpay.paymenthistoryservice.repository;
 
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
-import com.greentechpay.paymenthistoryservice.service.specification.PaymentHistorySpecification;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Long>,
@@ -28,5 +28,15 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     @Query("select ph from PaymentHistory  ph where ph.transactionId=:id")
     PaymentHistory findByTransactionId(String id);
 
-    boolean existsByUserId(String id);
+    @Query("select p.serviceId, sum (p.amount)from PaymentHistory p where (:startDate is null  or p.date>=:startDate)" +
+            "and (:endDate is null or p.date<=:endDate) group by p.serviceId")
+    List<Object[]> findServiceStatistics(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    default Map<Integer, BigDecimal> getServiceStatistics(LocalDate startDate, LocalDate endDate){
+        return findServiceStatistics(startDate,endDate).stream()
+                .collect(Collectors.toMap(
+                        entry->(Integer) entry[0],
+                        entry->(BigDecimal) entry[1]
+                ));
+    }
 }
