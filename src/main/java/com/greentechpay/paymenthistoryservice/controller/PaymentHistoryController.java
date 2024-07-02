@@ -29,7 +29,7 @@ public class PaymentHistoryController {
     private final PaymentHistoryService paymentHistoryService;
 
 
-    @PostMapping("/filter")
+    @PostMapping(value = "/filter")
     public ResponseEntity<PageResponse<List<PaymentHistoryDto>>>
     getAllWithFilter(@RequestBody FilterDto<PaymentHistoryCriteria> filterDto) {
         return ResponseEntity.ok(paymentHistoryService.getAllWithFilter(filterDto));

@@ -24,6 +24,50 @@ public class KafkaConsumerConfig {
     private final KafkaConfigs kafkaConfigs;
 
     @Bean
+    public ConsumerFactory<String, CreateBalanceToCard> consumerFactoryBalanceToCard() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "2");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.greentechpay.paymenthistoryservice.kafka.dto.CreateBalanceToCard");
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToCard> kafkaListenerContainerFactoryBalanceToCard() {
+        ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToCard> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryBalanceToCard());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, UpdateBalanceToCard> consumerFactoryUpdateBalanceToCard() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "3");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.greentechpay.paymenthistoryservice.kafka.dto.UpdateBalanceToCard");
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToCard> kafkaListenerContainerFactoryUpdateBalanceToCard() {
+        ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToCard> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryUpdateBalanceToCard());
+        return factory;
+    }
+
+    @Bean
     public ConsumerFactory<String, CreateCardToBalance> consumerFactoryCardToBalance() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());

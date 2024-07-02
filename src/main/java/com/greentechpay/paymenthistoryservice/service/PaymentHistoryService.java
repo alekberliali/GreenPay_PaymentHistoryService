@@ -182,7 +182,7 @@ public class PaymentHistoryService {
 
     //TODO refactor all consumer names
     @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
-    private void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
+    protected void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
         var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
         paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
         paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
@@ -191,7 +191,7 @@ public class PaymentHistoryService {
     }
 
     @KafkaListener(topics = "payment-update-saga", containerFactory = "kafkaUpdateListenerContainerFactory")
-    private void updateBullingPayment(UpdateBalanceToBalance updateBalanceToBalance) {
+    protected void updateBullingPayment(UpdateBalanceToBalance updateBalanceToBalance) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(updateBalanceToBalance.getTransactionId());
         notificationSendService.sendPaymentUpdateNotification(paymentHistory, updateBalanceToBalance);
         paymentHistory.setStatus(updateBalanceToBalance.getStatus());
@@ -201,7 +201,7 @@ public class PaymentHistoryService {
 
     @KafkaListener(topics = "balanceToBalance-payment-history-created-message",
             containerFactory = "kafkaListenerContainerFactoryBalanceToBalance")
-    public void createBalanceToBalance(CreateBalanceToBalance transactionDto) {
+    private void createBalanceToBalance(CreateBalanceToBalance transactionDto) {
         var paymentHistory = paymentHistoryMapper.balanceToBalanceToEntity(transactionDto);
         paymentHistory.setPaymentDate(transactionDto.getPaymentDate().toLocalDateTime());
         paymentHistory.setDate(transactionDto.getPaymentDate().toLocalDateTime().toLocalDate());
@@ -212,7 +212,7 @@ public class PaymentHistoryService {
 
     @KafkaListener(topics = "balanceToBalance-payment-history-updated-message",
             containerFactory = "kafkaUpdateListenerContainerFactory")
-    public void updateBalanceToBalance(UpdateBalanceToBalance updateBalanceToBalance) {
+    protected void updateBalanceToBalance(UpdateBalanceToBalance updateBalanceToBalance) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(updateBalanceToBalance.getTransactionId());
         paymentHistory.setAmountOut(updateBalanceToBalance.getAmountOut());
         paymentHistory.setCurrencyOut(updateBalanceToBalance.getCurrencyOut());
@@ -224,19 +224,18 @@ public class PaymentHistoryService {
 
     @KafkaListener(topics = "card-to-balance-created-payment-history-message",
             containerFactory = "kafkaListenerContainerFactoryCardToBalance")
-    public void createCardToBalance(CreateCardToBalance createCardToBalance) {
+    protected void createCardToBalance(CreateCardToBalance createCardToBalance) {
         var paymentHistory = paymentHistoryMapper.cardToBalance(createCardToBalance);
-        paymentHistory.setCurrency(createCardToBalance.getCurrency());
-        paymentHistory.setTransferType(createCardToBalance.getTransferType());
         paymentHistory.setCurrencyOut(Currency.NONE);
         paymentHistory.setPaymentDate(createCardToBalance.getPaymentDate().toLocalDateTime());
+        paymentHistory.setDate(createCardToBalance.getPaymentDate().toLocalDateTime().toLocalDate());
         paymentHistory.setCategoryName("Transfer");
         paymentHistoryRepository.save(paymentHistory);
     }
 
     @KafkaListener(topics = "card-to-balance-update-payment-history-message",
             containerFactory = "kafkaListenerContainerFactoryUpdateCardToBalance")
-    public void updateCardToBalance(UpdateCardToBalance updateCardToBalance) {
+    protected void updateCardToBalance(UpdateCardToBalance updateCardToBalance) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(updateCardToBalance.getTransactionId());
         paymentHistory.setAmount(updateCardToBalance.getAmount());
         paymentHistory.setStatus(updateCardToBalance.getStatus());
@@ -246,5 +245,26 @@ public class PaymentHistoryService {
         paymentHistory.setExternalPaymentId(updateCardToBalance.getExternalPaymentId());
         paymentHistoryRepository.save(paymentHistory);
         notificationSendService.sendPaymentCreateNotification(paymentHistory);
+    }
+
+    @KafkaListener(topics = "insert-payment-history-balance-to-card",
+            containerFactory = "kafkaListenerContainerFactoryBalanceToCard")
+    protected void createBalanceToCard(CreateBalanceToCard createBalanceToCard) {
+        var paymentHistory = paymentHistoryMapper.balanceToCard(createBalanceToCard);
+        paymentHistory.setPaymentDate(createBalanceToCard.getPaymentDate().toLocalDateTime());
+        paymentHistory.setDate(createBalanceToCard.getPaymentDate().toLocalDateTime().toLocalDate());
+        paymentHistory.setCurrencyOut(Currency.NONE);
+        paymentHistoryRepository.save(paymentHistory);
+        notificationSendService.sendPaymentCreateNotification(paymentHistory);
+    }
+
+    @KafkaListener(topics = "update-payment-history-balance-to-card",
+            containerFactory = "kafkaListenerContainerFactoryUpdateBalanceToCard")
+    protected void updateBalanceToCard(UpdateBalanceToCard updateBalanceToCard) {
+        var paymentHistory = paymentHistoryRepository.findByTransactionId(updateBalanceToCard.getTransactionId());
+        paymentHistory.setStatus(updateBalanceToCard.getStatus());
+        paymentHistory.setUpdateDate(updateBalanceToCard.getUpdateDate().toLocalDateTime());
+        paymentHistory.setExternalPaymentId(updateBalanceToCard.getExternalPaymentId());
+        paymentHistoryRepository.save(paymentHistory);
     }
 }

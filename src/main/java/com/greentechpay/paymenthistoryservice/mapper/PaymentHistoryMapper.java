@@ -2,6 +2,7 @@ package com.greentechpay.paymenthistoryservice.mapper;
 
 import com.greentechpay.paymenthistoryservice.dto.PaymentHistoryDto;
 import com.greentechpay.paymenthistoryservice.kafka.dto.CreateBalanceToBalance;
+import com.greentechpay.paymenthistoryservice.kafka.dto.CreateBalanceToCard;
 import com.greentechpay.paymenthistoryservice.kafka.dto.CreateCardToBalance;
 import com.greentechpay.paymenthistoryservice.kafka.dto.TResponse;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
@@ -21,7 +22,10 @@ public interface PaymentHistoryMapper {
     PaymentHistory balanceToBalanceToEntity(CreateBalanceToBalance balanceToBalance);
 
     @Mapping(target = "paymentDate", ignore = true)
-    @Mapping(target = "currency", ignore = true)
-    @Mapping(target = "transferType", ignore = true)
+   /* @Mapping(target = "currency", ignore = true)
+    @Mapping(target = "transferType", ignore = true)*/
     PaymentHistory cardToBalance(CreateCardToBalance createCardToBalance);
+
+    @Mapping(target = "paymentDate", ignore = true)
+    PaymentHistory balanceToCard(CreateBalanceToCard createBalanceToCard);
 }
