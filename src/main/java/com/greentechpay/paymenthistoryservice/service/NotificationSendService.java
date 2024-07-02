@@ -2,7 +2,7 @@ package com.greentechpay.paymenthistoryservice.service;
 
 import com.greentechpay.paymenthistoryservice.dto.Body;
 import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentNotificationMessageEvent;
-import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentUpdateEvent;
+import com.greentechpay.paymenthistoryservice.kafka.dto.UpdateBalanceToBalance;
 import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,8 @@ public class NotificationSendService {
                 .description(paymentHistory.getStatus().toString())
                 .build();
         PaymentNotificationMessageEvent message;
-        if (paymentHistory.getTransferType().equals(TransferType.BalanceToBalance)) {
+        if (paymentHistory.getTransferType().equals(TransferType.IbanToIban) ||
+                paymentHistory.getTransferType().equals(TransferType.IbanToPhoneNumber)) {
             message = PaymentNotificationMessageEvent.builder()
                     .Title(paymentHistory.getTransferType().toString())
                     .UserId(paymentHistory.getUserId())
@@ -47,10 +48,10 @@ public class NotificationSendService {
         kafkaTemplate.send("Notification-Message", message);
     }
 
-    protected void sendPaymentUpdateNotification(PaymentHistory paymentHistory, PaymentUpdateEvent paymentUpdateEvent) {
+    protected void sendPaymentUpdateNotification(PaymentHistory paymentHistory, UpdateBalanceToBalance updateBalanceToBalance) {
         var body = Body.builder()
                 .description("Your payments status changed from " + paymentHistory.getStatus()
-                        + " to " + paymentUpdateEvent.getStatus())
+                        + " to " + updateBalanceToBalance.getStatus())
                 .build();
         var message = PaymentNotificationMessageEvent.builder()
                 .Body(body)
