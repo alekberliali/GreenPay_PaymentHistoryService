@@ -180,7 +180,7 @@ public class PaymentHistoryService {
         return servicePayments;
     }
 
-    //TODO refactor all consumer names
+    //TODO amount and amountOut (medaxil,mexaric)
     @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
     protected void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
         var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
@@ -251,6 +251,7 @@ public class PaymentHistoryService {
             containerFactory = "kafkaListenerContainerFactoryBalanceToCard")
     protected void createBalanceToCard(CreateBalanceToCard createBalanceToCard) {
         var paymentHistory = paymentHistoryMapper.balanceToCard(createBalanceToCard);
+        paymentHistory.setCategoryName("Transfer");
         paymentHistory.setPaymentDate(createBalanceToCard.getPaymentDate().toLocalDateTime());
         paymentHistory.setDate(createBalanceToCard.getPaymentDate().toLocalDateTime().toLocalDate());
         paymentHistory.setCurrencyOut(Currency.NONE);
