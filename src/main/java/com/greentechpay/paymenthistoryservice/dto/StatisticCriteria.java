@@ -8,7 +8,9 @@ import java.util.List;
 @Data
 public class StatisticCriteria {
     List<Integer> serviceIdList;
+    String userId;
     String iban;
+    Currency currency;
     Integer vendorId;
     String categoryName;
     LocalDate startDate;

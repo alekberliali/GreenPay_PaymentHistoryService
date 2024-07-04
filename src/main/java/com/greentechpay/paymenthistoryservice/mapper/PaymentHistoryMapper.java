@@ -17,8 +17,6 @@ public interface PaymentHistoryMapper {
 
     @Mapping(target = "toUser", source = "receiverUserId")
     @Mapping(target = "userId", source = "senderUserId")
-    @Mapping(target = "currency", ignore = true)
-    @Mapping(target = "currencyOut", ignore = true)
     PaymentHistory balanceToBalanceToEntity(CreateBalanceToBalance balanceToBalance);
 
     @Mapping(target = "paymentDate", ignore = true)

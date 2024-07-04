@@ -21,9 +21,14 @@ public class StatisticSpecification implements Specification<PaymentHistory> {
     public Predicate toPredicate(Root<PaymentHistory> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 
         List<Predicate> predicates = new ArrayList<>();
-
+        if (statisticCriteria.getUserId()!=null){
+            predicates.add(criteriaBuilder.equal(root.get("userId"), statisticCriteria.getUserId()));
+        }
         if (statisticCriteria.getIban() != null) {
             predicates.add(criteriaBuilder.equal(root.get("senderIban"), statisticCriteria.getIban()));
+        }
+        if (statisticCriteria.getCurrency() != null) {
+            predicates.add(criteriaBuilder.equal(root.get("currency"), statisticCriteria.getCurrency()));
         }
         if (statisticCriteria.getCategoryName() != null) {
             predicates.add(criteriaBuilder.equal(root.get("categoryName"), statisticCriteria.getCategoryName()));
@@ -31,7 +36,7 @@ public class StatisticSpecification implements Specification<PaymentHistory> {
         if (statisticCriteria.getVendorId() != null) {
             predicates.add(criteriaBuilder.equal(root.get("vendorId"), statisticCriteria.getVendorId()));
         }
-        if (statisticCriteria.getServiceIdList()!=null){
+        if (statisticCriteria.getServiceIdList() != null) {
             predicates.add(root.get("serviceId").in(statisticCriteria.getServiceIdList()));
         }
         if (statisticCriteria.getStartDate() != null && statisticCriteria.getEndDate() != null) {
