@@ -52,8 +52,8 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
             if (paymentHistoryCriteria.getCurrencies() != null) {
                 predicates.add(root.get("currency").in(paymentHistoryCriteria.getCurrencies()));
             }
-            if (paymentHistoryCriteria.getTransferType() != null) {
-                predicates.add(root.get("transferType").in(paymentHistoryCriteria.getTransferType()));
+            if (paymentHistoryCriteria.getTransferTypes() != null) {
+                predicates.add(root.get("transferType").in(paymentHistoryCriteria.getTransferTypes()));
             }
             if (paymentHistoryCriteria.getStatuses() != null) {
                 predicates.add(root.get("status").in(paymentHistoryCriteria.getStatuses()));
