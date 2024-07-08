@@ -38,13 +38,13 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
             if (paymentHistoryCriteria.getVendorId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("vendorId"), paymentHistoryCriteria.getVendorId()));
             }
-            if (paymentHistoryCriteria.getMerchantId()!=null){
+            if (paymentHistoryCriteria.getMerchantId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("merchantId"), paymentHistoryCriteria.getMerchantId()));
             }
             if (paymentHistoryCriteria.getStartDate() != null && paymentHistoryCriteria.getEndDate() != null) {
                 predicates.add(criteriaBuilder.between(root.get("date"), paymentHistoryCriteria.getStartDate(),
                         paymentHistoryCriteria.getEndDate()));
-            } else if (paymentHistoryCriteria.getStartDate() == null && paymentHistoryCriteria.getEndDate() != null) {
+            } else if (paymentHistoryCriteria.getEndDate() != null) {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getEndDate()));
             } else if (paymentHistoryCriteria.getStartDate() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
@@ -59,6 +59,7 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
                 predicates.add(root.get("status").in(paymentHistoryCriteria.getStatuses()));
             }
         }
+        query.orderBy(criteriaBuilder.desc(root.get("paymentDate")));
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }
