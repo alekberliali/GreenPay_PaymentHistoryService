@@ -191,10 +191,10 @@ public class PaymentHistoryService {
     }
 
     @KafkaListener(topics = "payment-update-saga", containerFactory = "kafkaUpdateListenerContainerFactory")
-    protected void updateBullingPayment(UpdateBalanceToBalance updateBalanceToBalance) {
-        var paymentHistory = paymentHistoryRepository.findByTransactionId(updateBalanceToBalance.getTransactionId());
-        notificationSendService.sendPaymentUpdateNotification(paymentHistory, updateBalanceToBalance);
-        paymentHistory.setStatus(updateBalanceToBalance.getStatus());
+    protected void updateBullingPayment(BillingPaymentUpdateEvent<OperationContext> billingPaymentUpdateEvent) {
+        var paymentHistory = paymentHistoryRepository.findByTransactionId(billingPaymentUpdateEvent.getTransactionId());
+        //notificationSendService.sendPaymentUpdateNotification(paymentHistory, billingPaymentUpdateEvent);
+        paymentHistory.setStatus(billingPaymentUpdateEvent.getOperationContext().getPaymentStatus());
         paymentHistory.setUpdateDate(LocalDateTime.now());
         paymentHistoryRepository.save(paymentHistory);
     }
