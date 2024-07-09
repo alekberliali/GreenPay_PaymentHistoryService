@@ -10,6 +10,9 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.CommonErrorHandler;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.ExponentialBackOffWithMaxRetries;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
@@ -22,6 +25,15 @@ import java.util.Map;
 public class KafkaConsumerConfig {
 
     private final KafkaConfigs kafkaConfigs;
+
+    @Bean
+    public CommonErrorHandler errorHandler() {
+        ExponentialBackOffWithMaxRetries backOff = new ExponentialBackOffWithMaxRetries(3);
+        backOff.setInitialInterval(1000L);
+        backOff.setMultiplier(2);
+        backOff.setMaxInterval(10000L);
+        return new DefaultErrorHandler(backOff);
+    }
 
     @Bean
     public ConsumerFactory<String, CreateBalanceToCard> consumerFactoryBalanceToCard() {
@@ -42,6 +54,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToCard> kafkaListenerContainerFactoryBalanceToCard() {
         ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToCard> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryBalanceToCard());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -64,6 +77,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToCard> kafkaListenerContainerFactoryUpdateBalanceToCard() {
         ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToCard> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryUpdateBalanceToCard());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -86,6 +100,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, CreateCardToBalance> kafkaListenerContainerFactoryCardToBalance() {
         ConcurrentKafkaListenerContainerFactory<String, CreateCardToBalance> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryCardToBalance());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -108,6 +123,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, UpdateCardToBalance> kafkaListenerContainerFactoryUpdateCardToBalance() {
         ConcurrentKafkaListenerContainerFactory<String, UpdateCardToBalance> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryUpdateCardToBalance());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -130,6 +146,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToBalance> kafkaListenerContainerFactoryBalanceToBalance() {
         ConcurrentKafkaListenerContainerFactory<String, CreateBalanceToBalance> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryBalanceToBalance());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
     @Bean
@@ -150,6 +167,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToBalance> kafkaListenerContainerFactoryUpdateBalanceToBalance() {
         ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToBalance> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryUpdateBalanceToBalance());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -170,6 +188,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, PaymentSuccessEvent<?>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, PaymentSuccessEvent<?>> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 
@@ -191,6 +210,7 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, BillingPaymentUpdateEvent<?>> kafkaUpdateListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, BillingPaymentUpdateEvent<?>> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(updateEventConsumerFactory());
+        factory.setCommonErrorHandler(errorHandler());
         return factory;
     }
 }
