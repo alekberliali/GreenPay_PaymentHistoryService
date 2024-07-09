@@ -132,6 +132,26 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactoryBalanceToBalance());
         return factory;
     }
+    @Bean
+    public ConsumerFactory<String, UpdateBalanceToBalance> consumerFactoryUpdateBalanceToBalance() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "4");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class.getName());
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.greentechpay.paymenthistoryservice.kafka.dto.UpdateBalanceToBalance");
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToBalance> kafkaListenerContainerFactoryUpdateBalanceToBalance() {
+        ConcurrentKafkaListenerContainerFactory<String, UpdateBalanceToBalance> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryUpdateBalanceToBalance());
+        return factory;
+    }
 
     @Bean
     public ConsumerFactory<String, PaymentSuccessEvent<?>> consumerFactory() {
@@ -157,7 +177,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, BillingPaymentUpdateEvent<?>> updateEventConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "25");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "26");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, PaymentUpdateEventDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
