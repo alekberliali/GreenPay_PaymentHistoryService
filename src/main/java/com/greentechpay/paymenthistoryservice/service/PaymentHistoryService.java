@@ -182,7 +182,7 @@ public class PaymentHistoryService {
 
     @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
     protected void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
-        if (paymentHistoryRepository.existsByTransactionId(transactionDto.getResponse().getTransactionId())) {
+        if (!paymentHistoryRepository.existsByTransactionId(transactionDto.getResponse().getTransactionId())) {
             var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
             paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
             paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
@@ -203,7 +203,7 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "balanceToBalance-payment-history-created-message",
             containerFactory = "kafkaListenerContainerFactoryBalanceToBalance")
     private void createBalanceToBalance(CreateBalanceToBalance transactionDto) {
-        if (paymentHistoryRepository.existsByTransactionId(transactionDto.getTransactionId())) {
+        if (!paymentHistoryRepository.existsByTransactionId(transactionDto.getTransactionId())) {
             var paymentHistory = paymentHistoryMapper.balanceToBalanceToEntity(transactionDto);
             paymentHistory.setPaymentDate(transactionDto.getPaymentDate().toLocalDateTime());
             paymentHistory.setDate(transactionDto.getPaymentDate().toLocalDateTime().toLocalDate());
@@ -228,7 +228,7 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "card-to-balance-created-payment-history-message",
             containerFactory = "kafkaListenerContainerFactoryCardToBalance")
     protected void createCardToBalance(CreateCardToBalance createCardToBalance) {
-        if (paymentHistoryRepository.existsByTransactionId(createCardToBalance.getTransactionId())) {
+        if (!paymentHistoryRepository.existsByTransactionId(createCardToBalance.getTransactionId())) {
             var paymentHistory = paymentHistoryMapper.cardToBalance(createCardToBalance);
             paymentHistory.setCurrencyOut(Currency.NONE);
             paymentHistory.setPaymentDate(createCardToBalance.getPaymentDate().toLocalDateTime());
@@ -254,7 +254,7 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "insert-payment-history-balance-to-card",
             containerFactory = "kafkaListenerContainerFactoryBalanceToCard")
     protected void createBalanceToCard(CreateBalanceToCard createBalanceToCard) {
-        if (paymentHistoryRepository.existsByTransactionId(createBalanceToCard.getTransactionId())) {
+        if (!paymentHistoryRepository.existsByTransactionId(createBalanceToCard.getTransactionId())) {
             var paymentHistory = paymentHistoryMapper.balanceToCard(createBalanceToCard);
             paymentHistory.setCategoryName("Transfer");
             paymentHistory.setPaymentDate(createBalanceToCard.getPaymentDate().toLocalDateTime());
