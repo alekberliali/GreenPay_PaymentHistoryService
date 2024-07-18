@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 @Data
 public class UpdateCardToBalance {
     private String transactionId;
-    private BigDecimal amount;
     private Status status;
     private Timestamp updateDate;
     private String externalPaymentId;

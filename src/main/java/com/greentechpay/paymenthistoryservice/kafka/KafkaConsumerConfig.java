@@ -108,7 +108,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, UpdateCardToBalance> consumerFactoryUpdateCardToBalance() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "3");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "11");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
@@ -131,7 +131,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, CreateBalanceToBalance> consumerFactoryBalanceToBalance() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "1");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "2");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
@@ -153,7 +153,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, UpdateBalanceToBalance> consumerFactoryUpdateBalanceToBalance() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "4");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "6");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
@@ -175,7 +175,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, PaymentSuccessEvent<?>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "9");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "10");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, PaymentSuccessEventDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, ErrorHandlingDeserializer.class);
@@ -196,7 +196,7 @@ public class KafkaConsumerConfig {
     public ConsumerFactory<String, BillingPaymentUpdateEvent<?>> updateEventConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigs.getServer());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "26");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "27");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, PaymentUpdateEventDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);

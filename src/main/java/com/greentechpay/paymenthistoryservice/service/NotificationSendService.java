@@ -1,8 +1,7 @@
 package com.greentechpay.paymenthistoryservice.service;
 
 import com.greentechpay.paymenthistoryservice.dto.Body;
-import com.greentechpay.paymenthistoryservice.kafka.dto.PaymentNotificationMessageEvent;
-import com.greentechpay.paymenthistoryservice.kafka.dto.UpdateBalanceToBalance;
+import com.greentechpay.paymenthistoryservice.kafka.dto.*;
 import com.greentechpay.paymenthistoryservice.dto.TransferType;
 import com.greentechpay.paymenthistoryservice.entity.PaymentHistory;
 import lombok.RequiredArgsConstructor;
@@ -48,12 +47,37 @@ public class NotificationSendService {
         kafkaTemplate.send("Notification-Message", message);
     }
 
-    protected void sendPaymentUpdateNotification(PaymentHistory paymentHistory, UpdateBalanceToBalance updateBalanceToBalance) {
+    protected void sendPaymentUpdateNotification(PaymentHistory paymentHistory, OperationContext operationContext) {
         var body = Body.builder()
-                .description("Your payments status changed from " + paymentHistory.getStatus()
-                        + " to " + updateBalanceToBalance.getStatus())
+                .description(paymentHistory.getAmount() + " Your payments status changed from " + paymentHistory.getStatus()
+                        + " to " + operationContext.getPaymentStatus())
                 .build();
         var message = PaymentNotificationMessageEvent.builder()
+                .Title("Payment status update")
+                .Body(body)
+                .build();
+        kafkaTemplate.send("Notification-Message", message);
+    }
+
+    protected void sendUpdateBalanceToCard(PaymentHistory paymentHistory, UpdateBalanceToCard updateBalanceToCard) {
+        var body = Body.builder()
+                .description(paymentHistory.getAmount() + " Your transfer status changed from " + paymentHistory.getStatus()
+                        + " to " + updateBalanceToCard.getStatus())
+                .build();
+        var message = PaymentNotificationMessageEvent.builder()
+                .Title("Balance to card status update")
+                .Body(body)
+                .build();
+        kafkaTemplate.send("Notification-Message", message);
+    }
+
+    protected void sendUpdateCardToBalance(PaymentHistory paymentHistory, UpdateCardToBalance updateCardToBalance){
+        var body = Body.builder()
+                .description(paymentHistory.getAmount() + " Your transfer status changed from " + paymentHistory.getStatus()
+                        + " to " + updateCardToBalance.getStatus())
+                .build();
+        var message = PaymentNotificationMessageEvent.builder()
+                .Title("Card to balance status update")
                 .Body(body)
                 .build();
         kafkaTemplate.send("Notification-Message", message);

@@ -19,8 +19,6 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
 
     List<PaymentHistory> findAllByDate(LocalDate date);
 
-    @Query("select receipt from PaymentHistory receipt where receipt.senderRequestId=:senderRequestId")
-    PaymentHistory findSenderRequestId(String senderRequestId);
 
     @Query("select receipt from PaymentHistory receipt where receipt.id=:id")
     Optional<PaymentHistory> findById(Long id);
@@ -28,15 +26,5 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
     @Query("select ph from PaymentHistory  ph where ph.transactionId=:id")
     PaymentHistory findByTransactionId(String id);
 
-    @Query("select p.serviceId, sum (p.amount)from PaymentHistory p where (:startDate is null  or p.date>=:startDate)" +
-            "and (:endDate is null or p.date<=:endDate) group by p.serviceId")
-    List<Object[]> findServiceStatistics(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
-    default Map<Integer, BigDecimal> getServiceStatistics(LocalDate startDate, LocalDate endDate){
-        return findServiceStatistics(startDate,endDate).stream()
-                .collect(Collectors.toMap(
-                        entry->(Integer) entry[0],
-                        entry->(BigDecimal) entry[1]
-                ));
-    }
+    Boolean existsByTransactionId(@Param("transactionId") String transactionId);
 }
