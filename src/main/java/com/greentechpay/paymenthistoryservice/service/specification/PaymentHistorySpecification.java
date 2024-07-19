@@ -49,6 +49,9 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
             } else if (paymentHistoryCriteria.getStartDate() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
             }
+            if (paymentHistoryCriteria.getServiceIdList()!=null){
+                predicates.add(root.get("serviceId").in(paymentHistoryCriteria.getServiceIdList()));
+            }
             if (paymentHistoryCriteria.getCurrencies() != null) {
                 predicates.add(root.get("currency").in(paymentHistoryCriteria.getCurrencies()));
             }

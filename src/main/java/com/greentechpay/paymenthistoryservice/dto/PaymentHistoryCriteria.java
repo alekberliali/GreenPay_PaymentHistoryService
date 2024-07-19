@@ -16,6 +16,7 @@ public class PaymentHistoryCriteria {
     private String requestField;
     private String senderIban;
     private Long merchantId;
+    private List<Integer> serviceIdList;
     private List<Currency> currencies;
     private List<TransferType> transferTypes;
     private List<Status> statuses;
