@@ -5,4 +5,5 @@ import lombok.Data;
 public class PaymentSuccessEvent<T> {
     private String correlationId;
     private T response;
+    private String categoryName;
 }

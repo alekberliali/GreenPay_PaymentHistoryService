@@ -30,5 +30,4 @@ public class TResponse {
     private String requestField;
     private TransferType transferType;
     private Integer serviceId;
-    private String categoryName;
 }
