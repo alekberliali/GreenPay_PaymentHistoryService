@@ -183,18 +183,20 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
     protected void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
         if (!paymentHistoryRepository.existsByTransactionId(transactionDto.getResponse().getTransactionId())) {
+
+            var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
+            paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
+            paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
             if (transactionDto.getCategoryName() != null) {
-                var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
-                paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
-                paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
                 paymentHistory.setCategoryName(transactionDto.getCategoryName());
-                paymentHistoryRepository.save(paymentHistory);
-                notificationSendService.sendPaymentCreateNotification(paymentHistory);
-            }
+            } else paymentHistory.setCategoryName("Payment");
+            paymentHistoryRepository.save(paymentHistory);
+            notificationSendService.sendPaymentCreateNotification(paymentHistory);
+
         }
     }
 
-    @KafkaListener(topics = "payment-update-saga", containerFactory = "kafkaUpdateListenerContainerFactory")
+    @KafkaListener(topics = "payment-update-topic", containerFactory = "kafkaUpdateListenerContainerFactory")
     protected void updateBullingPayment(BillingPaymentUpdateEvent<OperationContext> billingPaymentUpdateEvent) {
         var paymentHistory = paymentHistoryRepository.findByTransactionId(billingPaymentUpdateEvent.getTransactionId());
         notificationSendService.sendPaymentUpdateNotification(paymentHistory, billingPaymentUpdateEvent.getOperationContext());

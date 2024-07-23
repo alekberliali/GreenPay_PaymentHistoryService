@@ -8,23 +8,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+
 @Service
 @RequiredArgsConstructor
 public class NotificationSendService {
     private final KafkaTemplate<String, PaymentNotificationMessageEvent> kafkaTemplate;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
     protected void sendPaymentCreateNotification(PaymentHistory paymentHistory) {
         var senderBody = Body.builder()
                 .amount(paymentHistory.getAmount())
                 .currency(paymentHistory.getCurrency())
-                .date(paymentHistory.getPaymentDate())
-                .requestField(paymentHistory.getRequestField())
+                .date(paymentHistory.getPaymentDate().format(formatter))
                 .description(paymentHistory.getStatus().toString())
                 .build();
         var receiverBody = Body.builder()
                 .amount(paymentHistory.getAmountOut())
                 .currency(paymentHistory.getCurrencyOut())
-                .date(paymentHistory.getPaymentDate())
+                .date(paymentHistory.getPaymentDate().format(formatter))
                 .description(paymentHistory.getStatus().toString())
                 .build();
         PaymentNotificationMessageEvent message;
