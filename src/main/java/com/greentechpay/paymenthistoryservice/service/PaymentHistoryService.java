@@ -183,12 +183,14 @@ public class PaymentHistoryService {
     @KafkaListener(topics = "payment-create-saga", containerFactory = "kafkaListenerContainerFactory")
     protected void createBillingPayment(PaymentSuccessEvent<TResponse> transactionDto) {
         if (!paymentHistoryRepository.existsByTransactionId(transactionDto.getResponse().getTransactionId())) {
-            var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
-            paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
-            paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
-            paymentHistory.setCategoryName(transactionDto.getCategoryName());
-            paymentHistoryRepository.save(paymentHistory);
-            notificationSendService.sendPaymentCreateNotification(paymentHistory);
+            if (transactionDto.getCategoryName() != null) {
+                var paymentHistory = paymentHistoryMapper.dtoToEntity(transactionDto.getResponse());
+                paymentHistory.setPaymentDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime());
+                paymentHistory.setDate(transactionDto.getResponse().getPaymentDate().toLocalDateTime().toLocalDate());
+                paymentHistory.setCategoryName(transactionDto.getCategoryName());
+                paymentHistoryRepository.save(paymentHistory);
+                notificationSendService.sendPaymentCreateNotification(paymentHistory);
+            }
         }
     }
 
