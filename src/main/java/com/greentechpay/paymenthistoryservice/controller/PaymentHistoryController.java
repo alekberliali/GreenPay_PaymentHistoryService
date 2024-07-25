@@ -7,12 +7,8 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.lang.Nullable;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +26,9 @@ public class PaymentHistoryController {
 
 
     @PostMapping(value = "/filter")
-    public ResponseEntity<PageResponse<List<PaymentHistoryDto>>>
+    public PageResponse<List<PaymentHistoryDto>>
     getAllWithFilter(@RequestBody FilterDto<PaymentHistoryCriteria> filterDto) {
-        return ResponseEntity.ok(paymentHistoryService.getAllWithFilter(filterDto));
+        return paymentHistoryService.getAllWithFilter(filterDto);
     }
 /*
     @GetMapping("/sender-request-id/{senderRequestId}")
@@ -40,9 +36,9 @@ public class PaymentHistoryController {
         return ResponseEntity.ok(paymentHistoryService.getBySenderRequestId(senderRequestId));
     }*/
 
-    @GetMapping("/receipt-id/{id}")
-    public ResponseEntity<PaymentHistoryDto> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(paymentHistoryService.getById(id));
+    @GetMapping("/{id}")
+    public PaymentHistoryDto getById(@PathVariable Long id, @RequestParam @Nullable Long merchantId) {
+        return paymentHistoryService.getById(id, merchantId);
     }
 
     @PostMapping("/category-statistics")
@@ -51,7 +47,7 @@ public class PaymentHistoryController {
     }
 
     @PostMapping("/category-statistics-by-name")
-    public ResponseEntity<Map<LocalDate, BigDecimal>>getCategoryStatisticsByName(@RequestBody StatisticCriteria statisticCriteria){
+    public ResponseEntity<Map<LocalDate, BigDecimal>> getCategoryStatisticsByName(@RequestBody StatisticCriteria statisticCriteria) {
         return ResponseEntity.ok(paymentHistoryService.getCategoryStatisticsByCategoryName(statisticCriteria));
     }
 

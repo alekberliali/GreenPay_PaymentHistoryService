@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 public class Body {
     private BigDecimal amount;
     private Currency currency;
-    private String requestField;
     private String date;
     private String description;
 }

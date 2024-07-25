@@ -65,8 +65,8 @@ public class PaymentHistoryService {
         }
     }*/
 
-    public PaymentHistoryDto getById(Long id) {
-        PaymentHistory paymentHistory = paymentHistoryRepository.findById(id)
+    public PaymentHistoryDto getById(Long id, Long merchantId) {
+        PaymentHistory paymentHistory = paymentHistoryRepository.findById(id, merchantId)
                 .orElseThrow(() -> new RuntimeException("receipt could not find by id: " + id));
         return paymentHistoryMapper.entityToDto(paymentHistory);
     }

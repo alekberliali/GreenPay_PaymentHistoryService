@@ -32,6 +32,9 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
                 var receiverIbanPredicate = criteriaBuilder.equal(root.get("receiverIban"), paymentHistoryCriteria.getSenderIban());
                 predicates.add(criteriaBuilder.or(senderIbanPredicate, receiverIbanPredicate));
             }
+            if (paymentHistoryCriteria.getCategoryName() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryName"), paymentHistoryCriteria.getCategoryName()));
+            }
             if (paymentHistoryCriteria.getTransactionId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("transactionId"), paymentHistoryCriteria.getTransactionId()));
             }
@@ -49,7 +52,7 @@ public class PaymentHistorySpecification implements Specification<PaymentHistory
             } else if (paymentHistoryCriteria.getStartDate() != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), paymentHistoryCriteria.getStartDate()));
             }
-            if (paymentHistoryCriteria.getServiceIdList()!=null){
+            if (paymentHistoryCriteria.getServiceIdList() != null) {
                 predicates.add(root.get("serviceId").in(paymentHistoryCriteria.getServiceIdList()));
             }
             if (paymentHistoryCriteria.getCurrencies() != null) {
