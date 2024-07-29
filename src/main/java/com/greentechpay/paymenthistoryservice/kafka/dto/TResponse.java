@@ -25,6 +25,7 @@ public class TResponse {
     private String currencyOut;
     private BigDecimal amountOut;
     private String userId;
+    private String iban;
     private Integer vendorId;
     private String toUser;
     private String requestField;

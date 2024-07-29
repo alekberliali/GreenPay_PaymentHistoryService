@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 public interface PaymentHistoryMapper {
     PaymentHistoryDto entityToDto(PaymentHistory paymentHistory);
 
+    @Mapping(target = "senderIban", source = "iban")
     PaymentHistory dtoToEntity(TResponse TResponse);
 
     @Mapping(target = "toUser", source = "receiverUserId")
@@ -20,8 +21,6 @@ public interface PaymentHistoryMapper {
     PaymentHistory balanceToBalanceToEntity(CreateBalanceToBalance balanceToBalance);
 
     @Mapping(target = "paymentDate", ignore = true)
-   /* @Mapping(target = "currency", ignore = true)
-    @Mapping(target = "transferType", ignore = true)*/
     PaymentHistory cardToBalance(CreateCardToBalance createCardToBalance);
 
     @Mapping(target = "paymentDate", ignore = true)

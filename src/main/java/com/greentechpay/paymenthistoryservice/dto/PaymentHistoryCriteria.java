@@ -9,6 +9,7 @@ import java.util.List;
 public class PaymentHistoryCriteria {
     private Long id;
     private String userId;
+    private String receiptId;
     private LocalDate startDate;
     private LocalDate endDate;
     private String transactionId;
