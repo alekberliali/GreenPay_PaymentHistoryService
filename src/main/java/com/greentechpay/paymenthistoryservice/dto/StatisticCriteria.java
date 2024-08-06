@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class StatisticCriteria {
     List<Integer> serviceIdList;
+    Long merchantId;
     String userId;
     String iban;
     Currency currency;
